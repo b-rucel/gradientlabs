@@ -241,6 +241,7 @@ const PRESETS: Preset[] = [
 function App() {
   const [gradient, setGradient] = useState<GradientState>(PRESETS[0].config)
   const [activePreset, setActivePreset] = useState(0)
+  const [isDownloading, setIsDownloading] = useState(false)
 
   const [copied, setCopied] = useState(false)
   const [expandedSections, setExpandedSections] = useState({
@@ -264,7 +265,7 @@ function App() {
       : { r: 255, g: 255, b: 255 }
   }
 
-  const generateBackgroundCSS = () => {
+  const getGradientLayers = () => {
     const patternRGB = hexToRgb(gradient.patternColor)
     const patternOpacityDecimal = (gradient.patternOpacity / 100).toFixed(2)
 
@@ -281,9 +282,18 @@ function App() {
     const color2 = `rgba(${color2RGB.r}, ${color2RGB.g}, ${color2RGB.b}, ${color2Opacity})`
     const color3 = `rgba(${color3RGB.r}, ${color3RGB.g}, ${color3RGB.b}, ${color3Opacity})`
 
-    return `repeating-linear-gradient(${gradient.pattern1Angle}deg, rgba(${patternRGB.r}, ${patternRGB.g}, ${patternRGB.b}, ${patternOpacityDecimal}) 0px, rgba(${patternRGB.r}, ${patternRGB.g}, ${patternRGB.b}, ${patternOpacityDecimal}) ${gradient.pattern1Size}px, transparent ${gradient.pattern1Size + 4}px, transparent ${gradient.pattern1Size + 5}px),
-repeating-linear-gradient(${gradient.pattern2Angle}deg, rgba(${patternRGB.r}, ${patternRGB.g}, ${patternRGB.b}, ${patternOpacityDecimal}) 0px, rgba(${patternRGB.r}, ${patternRGB.g}, ${patternRGB.b}, ${patternOpacityDecimal}) ${gradient.pattern2Size}px, transparent ${gradient.pattern2Size + 4}px, transparent ${gradient.pattern2Size + 5}px),
-linear-gradient(${gradient.gradientAngle}deg, ${color1} ${gradient.color1Position}%, ${color2} ${gradient.color2Position}%, ${color3} ${gradient.color3Position}%)`
+    return {
+      pattern1: `repeating-linear-gradient(${gradient.pattern1Angle}deg, rgba(${patternRGB.r}, ${patternRGB.g}, ${patternRGB.b}, ${patternOpacityDecimal}) 0px, rgba(${patternRGB.r}, ${patternRGB.g}, ${patternRGB.b}, ${patternOpacityDecimal}) ${gradient.pattern1Size}px, transparent ${gradient.pattern1Size + 4}px, transparent ${gradient.pattern1Size + 5}px)`,
+      pattern2: `repeating-linear-gradient(${gradient.pattern2Angle}deg, rgba(${patternRGB.r}, ${patternRGB.g}, ${patternRGB.b}, ${patternOpacityDecimal}) 0px, rgba(${patternRGB.r}, ${patternRGB.g}, ${patternRGB.b}, ${patternOpacityDecimal}) ${gradient.pattern2Size}px, transparent ${gradient.pattern2Size + 4}px, transparent ${gradient.pattern2Size + 5}px)`,
+      main: `linear-gradient(${gradient.gradientAngle}deg, ${color1} ${gradient.color1Position}%, ${color2} ${gradient.color2Position}%, ${color3} ${gradient.color3Position}%)`
+    }
+  }
+
+  const generateBackgroundCSS = (): string => {
+    const layers = getGradientLayers()
+    return `${layers.pattern1},
+${layers.pattern2},
+${layers.main}`
   }
 
   const cssCode = `background: ${generateBackgroundCSS()};
@@ -336,6 +346,114 @@ background-size: cover;`
     setActivePreset(-1)
   }
 
+  const drawRepeatingPattern = (
+    ctx: CanvasRenderingContext2D,
+    angle: number,
+    size: number,
+    patternColor: string,
+    patternOpacity: string,
+    width: number,
+    height: number
+  ): void => {
+    ctx.save()
+
+    // Set the fill style with opacity
+    ctx.fillStyle = `rgba(${patternColor}, ${patternOpacity})`
+
+    // Translate to center and rotate
+    ctx.translate(width / 2, height / 2)
+    ctx.rotate((angle * Math.PI) / 180)
+    ctx.translate(-width / 2, -height / 2)
+
+    // Draw repeating filled rectangles
+    const spacing = size + 4
+    const maxDim = Math.max(width, height) * 2
+    for (let pos = -maxDim; pos < maxDim; pos += spacing) {
+      ctx.fillRect(pos, -maxDim, size, maxDim * 4)
+    }
+
+    ctx.restore()
+  }
+
+  const handleDownload = (): void => {
+    setIsDownloading(true)
+
+    const width = 1920
+    const height = 1080
+
+    const canvas = document.createElement('canvas')
+    canvas.width = width
+    canvas.height = height
+    const ctx = canvas.getContext('2d')
+
+    if (!ctx) {
+      console.error('Failed to get canvas context')
+      setIsDownloading(false)
+      return
+    }
+
+    // Parse gradient colors
+    const color1RGB = hexToRgb(gradient.color1)
+    const color2RGB = hexToRgb(gradient.color2)
+    const color3RGB = hexToRgb(gradient.color3)
+
+    const color1Opacity = gradient.color1Opacity / 100
+    const color2Opacity = gradient.color2Opacity / 100
+    const color3Opacity = gradient.color3Opacity / 100
+
+    // 1. Draw main gradient using canvas gradient API
+    const angleRad = (gradient.gradientAngle * Math.PI) / 180
+    const x1 = width / 2 - Math.cos(angleRad) * Math.max(width, height) / 2
+    const y1 = height / 2 - Math.sin(angleRad) * Math.max(width, height) / 2
+    const x2 = width / 2 + Math.cos(angleRad) * Math.max(width, height) / 2
+    const y2 = height / 2 + Math.sin(angleRad) * Math.max(width, height) / 2
+
+    const canvasGradient = ctx.createLinearGradient(x1, y1, x2, y2)
+    canvasGradient.addColorStop(gradient.color1Position / 100, `rgba(${color1RGB.r}, ${color1RGB.g}, ${color1RGB.b}, ${color1Opacity})`)
+    canvasGradient.addColorStop(gradient.color2Position / 100, `rgba(${color2RGB.r}, ${color2RGB.g}, ${color2RGB.b}, ${color2Opacity})`)
+    canvasGradient.addColorStop(gradient.color3Position / 100, `rgba(${color3RGB.r}, ${color3RGB.g}, ${color3RGB.b}, ${color3Opacity})`)
+
+    ctx.fillStyle = canvasGradient
+    ctx.fillRect(0, 0, width, height)
+
+    // Get pattern color
+    const patternRGB = hexToRgb(gradient.patternColor)
+    const patternOpacityStr = (gradient.patternOpacity / 100).toFixed(2)
+
+    // 2. Draw pattern 2
+    drawRepeatingPattern(
+      ctx,
+      gradient.pattern2Angle,
+      gradient.pattern2Size,
+      `${patternRGB.r}, ${patternRGB.g}, ${patternRGB.b}`,
+      patternOpacityStr,
+      width,
+      height
+    )
+
+    // 3. Draw pattern 1 (on top)
+    drawRepeatingPattern(
+      ctx,
+      gradient.pattern1Angle,
+      gradient.pattern1Size,
+      `${patternRGB.r}, ${patternRGB.g}, ${patternRGB.b}`,
+      patternOpacityStr,
+      width,
+      height
+    )
+
+    try {
+      const link = document.createElement('a')
+      link.download = `gradient-labs-${Date.now()}.png`
+      link.href = canvas.toDataURL('image/png')
+      link.click()
+    } catch (error) {
+      console.error('Error generating image:', error)
+    } finally {
+      setIsDownloading(false)
+    }
+  }
+
   const backgroundStyle = {
     background: generateBackgroundCSS(),
     backgroundSize: 'cover',
@@ -347,16 +465,51 @@ background-size: cover;`
       {/* Sidebar Controls */}
       <div className="w-[400px] flex-shrink-0 flex flex-col bg-white border-r border-gray-200 h-full shadow-xl z-20 transition-all duration-300">
 
-        {/* Header */}
-        <div className="p-6 border-b border-gray-100 bg-white/50 backdrop-blur-sm sticky top-0 z-30">
-          <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600 flex items-center gap-2">
-            <span className="text-2xl">✨</span> Gradient Labs
-          </h1>
-          <p className="text-sm text-gray-500 mt-1 pl-9">Craft beautiful gradients & patterns</p>
+        {/* Header - Sticky */}
+        <div className="p-6 border-b border-gray-100 bg-white/80 backdrop-blur-md sticky top-0 z-30 space-y-4 shadow-sm">
+          <div>
+            <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600 flex items-center gap-2">
+              <span className="text-2xl">✨</span> Gradient Labs
+            </h1>
+            <p className="text-sm text-gray-500 mt-1 pl-9">Craft beautiful gradients & patterns</p>
+          </div>
+
+          {/* Actions Toolbar */}
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              onClick={handleDownload}
+              disabled={isDownloading}
+              className="flex-1 py-2 px-3 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg transition-all shadow-sm hover:shadow flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-wait"
+            >
+              {isDownloading ? (
+                <>
+                  <svg className="animate-spin h-3 w-3 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  <span>Saving...</span>
+                </>
+              ) : (
+                <>
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
+                  </svg>
+                  <span>Download PNG</span>
+                </>
+              )}
+            </button>
+
+            <button
+              onClick={randomizeGradient}
+              className="flex-1 py-2 px-3 bg-white border border-gray-200 hover:border-blue-300 text-gray-600 font-semibold rounded-lg hover:bg-blue-50 transition-all flex items-center justify-center gap-2 text-xs shadow-sm"
+            >
+              <span>🎲</span> Randomize
+            </button>
+          </div>
         </div>
 
         {/* Scrollable Content */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-8 custom-scrollbar">
+        <div className="flex-1 overflow-y-auto p-6 space-y-8 custom-scrollbar pb-10">
 
           {/* Presets Section */}
           <section className="space-y-4">
@@ -377,8 +530,8 @@ background-size: cover;`
                     key={index}
                     onClick={() => applyPreset(index)}
                     className={`group relative flex flex-col overflow-hidden rounded-xl border transition-all duration-200 hover:shadow-md ${activePreset === index
-                        ? 'border-blue-500 ring-1 ring-blue-500 ring-offset-2'
-                        : 'border-gray-200 hover:border-gray-300'
+                      ? 'border-blue-500 ring-1 ring-blue-500 ring-offset-2'
+                      : 'border-gray-200 hover:border-gray-300'
                       }`}
                   >
                     <div
@@ -561,16 +714,6 @@ background-size: cover;`
             </div>
           </section>
 
-        </div>
-
-        {/* Footer - Fixed */}
-        <div className="p-4 border-t border-gray-200 bg-gray-50/80 backdrop-blur absolute bottom-0 w-full z-30">
-          <button
-            onClick={randomizeGradient}
-            className="w-full py-3 bg-white border-2 border-dashed border-gray-300 rounded-xl text-gray-500 font-medium hover:text-blue-600 hover:border-blue-400 hover:bg-blue-50 transition-all flex items-center justify-center gap-2 shadow-sm"
-          >
-            <span>🎲</span> Randomize Style
-          </button>
         </div>
       </div>
 
