@@ -39,10 +39,14 @@ export const useGradient = () => {
       gradientAngle: Math.floor(Math.random() * 360),
       patternOpacity: Math.floor(Math.random() * 20) + 2,
       patternColor: '#ffffff',
+      patternEnabled: true,
       pattern1Angle: Math.floor(Math.random() * 90),
       pattern1Size: Math.floor(Math.random() * 30) + 5,
       pattern2Angle: Math.floor(Math.random() * 90) - 90,
       pattern2Size: Math.floor(Math.random() * 30) + 5,
+      noiseEnabled: false,
+      noiseOpacity: 10,
+      noiseSize: 10,
     })
     setActivePreset(-1)
   }, [])

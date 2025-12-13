@@ -46,6 +46,21 @@ ${layers.main}`
 }
 
 export const generateCSSCode = (gradient: GradientState): string => {
-  return `background: ${generateBackgroundCSS(gradient)};
+  let css = `background: ${generateBackgroundCSS(gradient)};
 background-size: cover;`
+
+  if (gradient.noiseEnabled) {
+    css += `
+
+/* Noise overlay - apply to a pseudo-element or overlay div */
+.noise-overlay {
+  background-image: url('/noise.png');
+  background-position: 50%;
+  background-repeat: repeat;
+  background-size: ${gradient.noiseSize}%;
+  opacity: ${gradient.noiseOpacity / 100};
+}`
+  }
+
+  return css
 }

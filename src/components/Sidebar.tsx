@@ -2,6 +2,7 @@ import { SidebarHeader } from './SidebarHeader'
 import { PresetSection } from './PresetSection'
 import { ColorStopsSection } from './ColorStopsSection'
 import { PatternSection } from './PatternSection'
+import { NoiseSection } from './NoiseSection'
 import { CSSOutput } from './CSSOutput'
 import type { GradientState } from '../types'
 
@@ -15,6 +16,7 @@ interface SidebarProps {
     mainGradient: boolean
     grainPattern: boolean
     patternCard: boolean
+    noiseTexture: boolean
   }
   cssCode: string
   onUpdateGradient: (key: keyof GradientState, value: string | number | boolean) => void
@@ -73,6 +75,15 @@ export function Sidebar({
           expandedCard={expandedSections.patternCard}
           onTogglePattern={() => onToggleSection('grainPattern')}
           onToggleCard={() => onToggleSection('patternCard')}
+          onUpdateGradient={onUpdateGradient}
+        />
+
+        <hr className="border-gray-100" />
+
+        <NoiseSection
+          gradient={gradient}
+          expanded={expandedSections.noiseTexture}
+          onToggle={() => onToggleSection('noiseTexture')}
           onUpdateGradient={onUpdateGradient}
         />
 

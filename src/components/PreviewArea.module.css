@@ -1,0 +1,24 @@
+.previewArea {
+  position: relative;
+  flex: 1;
+  overflow: hidden;
+}
+
+.gradientBase {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.noiseOverlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url('/noise.png');
+  background-position: 50%;
+  background-repeat: repeat;
+  pointer-events: none;
+  z-index: 1;
+}

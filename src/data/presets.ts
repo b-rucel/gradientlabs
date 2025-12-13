@@ -21,6 +21,9 @@ export const PRESETS: Preset[] = [
       pattern1Size: 10,
       pattern2Angle: -45,
       pattern2Size: 10,
+      noiseEnabled: false,
+      noiseOpacity: 10,
+      noiseSize: 10,
     },
   },
   {
@@ -43,6 +46,9 @@ export const PRESETS: Preset[] = [
       pattern1Size: 12,
       pattern2Angle: -30,
       pattern2Size: 12,
+      noiseEnabled: false,
+      noiseOpacity: 10,
+      noiseSize: 10,
     },
   },
   {
@@ -65,6 +71,9 @@ export const PRESETS: Preset[] = [
       pattern1Size: 8,
       pattern2Angle: -60,
       pattern2Size: 8,
+      noiseEnabled: false,
+      noiseOpacity: 10,
+      noiseSize: 10,
     },
   },
   {
@@ -87,6 +96,9 @@ export const PRESETS: Preset[] = [
       pattern1Size: 15,
       pattern2Angle: -45,
       pattern2Size: 15,
+      noiseEnabled: false,
+      noiseOpacity: 10,
+      noiseSize: 10,
     },
   },
   {
@@ -109,6 +121,9 @@ export const PRESETS: Preset[] = [
       pattern1Size: 11,
       pattern2Angle: -75,
       pattern2Size: 11,
+      noiseEnabled: false,
+      noiseOpacity: 10,
+      noiseSize: 10,
     },
   },
   {
@@ -131,6 +146,9 @@ export const PRESETS: Preset[] = [
       pattern1Size: 8,
       pattern2Angle: -45,
       pattern2Size: 8,
+      noiseEnabled: false,
+      noiseOpacity: 10,
+      noiseSize: 10,
     },
   },
   {
@@ -153,6 +171,9 @@ export const PRESETS: Preset[] = [
       pattern1Size: 6,
       pattern2Angle: 0,
       pattern2Size: 6,
+      noiseEnabled: false,
+      noiseOpacity: 10,
+      noiseSize: 10,
     },
   },
   {
@@ -175,6 +196,9 @@ export const PRESETS: Preset[] = [
       pattern1Size: 12,
       pattern2Angle: -45,
       pattern2Size: 12,
+      noiseEnabled: false,
+      noiseOpacity: 10,
+      noiseSize: 10,
     },
   },
   {
@@ -197,6 +221,9 @@ export const PRESETS: Preset[] = [
       pattern1Size: 8,
       pattern2Angle: -119,
       pattern2Size: 6,
+      noiseEnabled: false,
+      noiseOpacity: 10,
+      noiseSize: 10,
     },
   },
   {
@@ -219,6 +246,9 @@ export const PRESETS: Preset[] = [
       pattern1Size: 2,
       pattern2Angle: -131,
       pattern2Size: 2,
+      noiseEnabled: false,
+      noiseOpacity: 10,
+      noiseSize: 10,
     },
   },
   {
@@ -241,6 +271,9 @@ export const PRESETS: Preset[] = [
       pattern1Size: 46,
       pattern2Angle: -45,
       pattern2Size: 50,
+      noiseEnabled: false,
+      noiseOpacity: 10,
+      noiseSize: 10,
     },
   },
 ]

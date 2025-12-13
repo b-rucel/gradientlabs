@@ -16,6 +16,9 @@ export interface GradientState {
   pattern1Size: number
   pattern2Angle: number
   pattern2Size: number
+  noiseEnabled: boolean
+  noiseOpacity: number
+  noiseSize: number
 }
 
 export interface Preset {

@@ -14,6 +14,7 @@ function App() {
     mainGradient: true,
     grainPattern: true,
     patternCard: true,
+    noiseTexture: true,
   })
 
   const toggleSection = (section: keyof typeof expandedSections) => {
@@ -59,7 +60,7 @@ function App() {
         onCopyCSSCode={copyCSSCode}
       />
 
-      <PreviewArea backgroundStyle={backgroundStyle} />
+      <PreviewArea backgroundStyle={backgroundStyle} gradient={gradient} />
     </div>
   )
 }

@@ -1,13 +1,16 @@
 import { useState, useRef, useEffect } from 'react'
+import type { GradientState } from '../types'
+import styles from './PreviewArea.module.css'
 
 interface PreviewAreaProps {
   backgroundStyle: {
     background: string
     backgroundSize: string
   }
+  gradient?: GradientState
 }
 
-export function PreviewArea({ backgroundStyle }: PreviewAreaProps) {
+export function PreviewArea({ backgroundStyle, gradient }: PreviewAreaProps) {
   const [isFullscreen, setIsFullscreen] = useState(false)
   const gradientCardRef = useRef<HTMLDivElement>(null)
 
@@ -56,6 +59,17 @@ export function PreviewArea({ backgroundStyle }: PreviewAreaProps) {
         className="w-full h-full max-w-6xl max-h-[90vh] rounded-3xl shadow-2xl relative overflow-hidden ring-8 ring-white/40 backdrop-blur-xl transition-all duration-500 ease-out"
         style={backgroundStyle}
       >
+        {/* Noise Overlay */}
+        {gradient?.noiseEnabled && (
+          <div
+            className={styles.noiseOverlay}
+            style={{
+              opacity: gradient.noiseOpacity / 100,
+              backgroundSize: `${gradient.noiseSize}%`
+            }}
+          />
+        )}
+
         {/* Optional: Add some overlay UI in the preview to show it's "Live" */}
         {!isFullscreen && (
           <div className="absolute bottom-8 left-8 text-white/90 text-sm font-medium px-4 py-2 bg-black/20 backdrop-blur-md rounded-full border border-white/10 flex items-center gap-2">
