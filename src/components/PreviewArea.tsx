@@ -3,10 +3,7 @@ import type { GradientState } from '../types'
 import styles from './PreviewArea.module.css'
 
 interface PreviewAreaProps {
-  backgroundStyle: {
-    background: string
-    backgroundSize: string
-  }
+  backgroundStyle: Record<string, string>
   gradient?: GradientState
 }
 

@@ -1,29 +1,31 @@
 import { SidebarHeader } from './SidebarHeader'
 import { PresetSection } from './PresetSection'
-import { ColorStopsSection } from './ColorStopsSection'
+import { GradientLayersManager } from './GradientLayersManager'
 import { PatternSection } from './PatternSection'
 import { NoiseSection } from './NoiseSection'
 import { CSSOutput } from './CSSOutput'
-import type { GradientState } from '../types'
+import type { GradientState, GradientLayer } from '../types'
+
+type ExpandedSections = {
+  presets: boolean
+  gradientLayers: boolean
+  grainPattern: boolean
+  patternCard: boolean
+  noiseTexture: boolean
+}
 
 interface SidebarProps {
   gradient: GradientState
   activePreset: number
   isDownloading: boolean
   copied: boolean
-  expandedSections: {
-    presets: boolean
-    mainGradient: boolean
-    grainPattern: boolean
-    patternCard: boolean
-    noiseTexture: boolean
-  }
+  expandedSections: ExpandedSections
   cssCode: string
-  onUpdateGradient: (key: keyof GradientState, value: string | number | boolean) => void
+  onUpdateGradient: (key: keyof GradientState, value: string | number | boolean | GradientLayer[]) => void
   onApplyPreset: (index: number) => void
   onRandomize: () => void
   onDownload: () => void
-  onToggleSection: (section: keyof typeof expandedSections) => void
+  onToggleSection: (section: keyof ExpandedSections) => void
   onCopyCSSCode: () => void
 }
 
@@ -60,11 +62,11 @@ export function Sidebar({
 
         <hr className="border-gray-100" />
 
-        <ColorStopsSection
+        <GradientLayersManager
           gradient={gradient}
-          expanded={expandedSections.mainGradient}
-          onToggle={() => onToggleSection('mainGradient')}
-          onUpdateGradient={onUpdateGradient}
+          expanded={expandedSections.gradientLayers}
+          onToggle={() => onToggleSection('gradientLayers')}
+          onUpdate={onUpdateGradient}
         />
 
         <hr className="border-gray-100" />

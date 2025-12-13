@@ -1,6 +1,65 @@
-import type { Preset } from '../types'
+import type { Preset, GradientState } from '../types'
 
-export const PRESETS: Preset[] = [
+const addDefaultProperties = (config: Partial<GradientState>): GradientState => ({
+  // Gradient type
+  gradientType: 'linear',
+
+  // Colors (keep existing values)
+  color1: config.color1 || '#0088cc',
+  color2: config.color2 || '#ff8844',
+  color3: config.color3 || '#1a3a52',
+  color1Opacity: config.color1Opacity || 100,
+  color2Opacity: config.color2Opacity || 100,
+  color3Opacity: config.color3Opacity || 100,
+  color1Position: config.color1Position || 0,
+  color2Position: config.color2Position || 50,
+  color3Position: config.color3Position || 100,
+
+  // Linear gradient properties
+  gradientAngle: config.gradientAngle || 135,
+
+  // Radial gradient properties
+  radialCenterX: 50,
+  radialCenterY: 50,
+  radialShape: 'circle',
+  radialSize: 'farthest-corner',
+
+  // Conic gradient properties
+  conicAngle: 0,
+  conicCenterX: 50,
+  conicCenterY: 50,
+
+  // Multi-layer blending properties
+  gradientLayers: config.gradientLayers || [],
+  multiLayerBlendingEnabled: config.multiLayerBlendingEnabled || false,
+
+  // Legacy blending properties
+  blendingEnabled: false,
+  blendMode: 'multiply',
+  secondGradientType: 'linear',
+  secondGradientAngle: 45,
+  secondColor1: '#ff0000',
+  secondColor2: '#0000ff',
+  secondColor1Position: 0,
+  secondColor2Position: 100,
+  blendOpacity: 50,
+
+  // Pattern properties (keep existing values)
+  patternOpacity: config.patternOpacity || 5,
+  patternColor: config.patternColor || '#ffffff',
+  patternEnabled: config.patternEnabled !== undefined ? config.patternEnabled : true,
+  pattern1Angle: config.pattern1Angle || 45,
+  pattern1Size: config.pattern1Size || 10,
+  pattern2Angle: config.pattern2Angle || -45,
+  pattern2Size: config.pattern2Size || 10,
+
+  // Noise properties (keep existing values)
+  noiseEnabled: config.noiseEnabled !== undefined ? config.noiseEnabled : false,
+  noiseOpacity: config.noiseOpacity || 10,
+  noiseSize: config.noiseSize || 10,
+})
+
+const rawPresets = [
   {
     name: 'Classic',
     config: {
@@ -276,4 +335,91 @@ export const PRESETS: Preset[] = [
       noiseSize: 10,
     },
   },
+  {
+    name: 'Triple Blend',
+    config: {
+      color1: '#1a1a2e',
+      color2: '#16213e',
+      color3: '#0f3460',
+      color1Opacity: 100,
+      color2Opacity: 100,
+      color3Opacity: 100,
+      color1Position: 0,
+      color2Position: 50,
+      color3Position: 100,
+      gradientAngle: 135,
+      patternOpacity: 5,
+      patternColor: '#ffffff',
+      patternEnabled: true,
+      pattern1Angle: 45,
+      pattern1Size: 10,
+      pattern2Angle: -45,
+      pattern2Size: 10,
+      noiseEnabled: false,
+      noiseOpacity: 10,
+      noiseSize: 10,
+      gradientLayers: [
+        {
+          id: 'layer-1',
+          type: 'linear' as const,
+          color1: '#ff0000',
+          color2: '#ff7f00',
+          color1Position: 0,
+          color2Position: 100,
+          opacity: 80,
+          blendMode: 'screen',
+          angle: 217,
+          radialCenterX: 50,
+          radialCenterY: 50,
+          radialShape: 'circle' as const,
+          radialSize: 'farthest-corner' as const,
+          conicAngle: 0,
+          conicCenterX: 50,
+          conicCenterY: 50,
+        },
+        {
+          id: 'layer-2',
+          type: 'linear' as const,
+          color1: '#00ff00',
+          color2: '#00ff7f',
+          color1Position: 0,
+          color2Position: 100,
+          opacity: 80,
+          blendMode: 'screen',
+          angle: 127,
+          radialCenterX: 50,
+          radialCenterY: 50,
+          radialShape: 'circle' as const,
+          radialSize: 'farthest-corner' as const,
+          conicAngle: 0,
+          conicCenterX: 50,
+          conicCenterY: 50,
+        },
+        {
+          id: 'layer-3',
+          type: 'linear' as const,
+          color1: '#0000ff',
+          color2: '#7f00ff',
+          color1Position: 0,
+          color2Position: 100,
+          opacity: 80,
+          blendMode: 'screen',
+          angle: 336,
+          radialCenterX: 50,
+          radialCenterY: 50,
+          radialShape: 'circle' as const,
+          radialSize: 'farthest-corner' as const,
+          conicAngle: 0,
+          conicCenterX: 50,
+          conicCenterY: 50,
+        },
+      ],
+      multiLayerBlendingEnabled: true,
+    },
+  },
 ]
+
+export const PRESETS: Preset[] = rawPresets.map(preset => ({
+  ...preset,
+  config: addDefaultProperties(preset.config)
+}))

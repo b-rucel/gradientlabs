@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useGradient } from './hooks/useGradient'
-import { generateBackgroundCSS, generateCSSCode } from './utils/gradientUtils'
+import { generateBackgroundCSS, generateBackgroundStyle, generateCSSCode } from './utils/gradientUtils'
 import { downloadGradientPNG } from './utils/canvasUtils'
 import { Sidebar } from './components/Sidebar'
 import { PreviewArea } from './components/PreviewArea'
@@ -11,7 +11,7 @@ function App() {
   const [copied, setCopied] = useState(false)
   const [expandedSections, setExpandedSections] = useState({
     presets: true,
-    mainGradient: true,
+    gradientLayers: true,
     grainPattern: true,
     patternCard: true,
     noiseTexture: true,
@@ -38,10 +38,7 @@ function App() {
     }
   }
 
-  const backgroundStyle = {
-    background: generateBackgroundCSS(gradient),
-    backgroundSize: 'cover',
-  }
+  const backgroundStyle = generateBackgroundStyle(gradient)
 
   return (
     <div className="flex h-screen bg-gray-50 overflow-hidden font-sans text-gray-900 selection:bg-blue-100 selection:text-blue-900">

@@ -1,12 +1,15 @@
 import Slider from './Slider'
 import { ColorStop } from './ColorStop'
+import { GradientTypeSelector } from './GradientTypeSelector'
+import { RadialGradientControls } from './RadialGradientControls'
+import { ConicGradientControls } from './ConicGradientControls'
 import type { GradientState } from '../types'
 
 interface ColorStopsSectionProps {
   gradient: GradientState
   expanded: boolean
   onToggle: () => void
-  onUpdateGradient: (key: keyof GradientState, value: string | number) => void
+  onUpdateGradient: (key: keyof GradientState, value: string | number | boolean) => void
 }
 
 export function ColorStopsSection({ gradient, expanded, onToggle, onUpdateGradient }: ColorStopsSectionProps) {
@@ -26,6 +29,12 @@ export function ColorStopsSection({ gradient, expanded, onToggle, onUpdateGradie
 
       {expanded && (
         <div className="bg-gray-50/50 rounded-2xl p-4 border border-gray-100 space-y-6 animate-slideDown">
+          {/* Gradient Type Selector */}
+          <GradientTypeSelector
+            gradientType={gradient.gradientType}
+            onTypeChange={(type) => onUpdateGradient('gradientType', type)}
+          />
+
           {/* Color Stops */}
           <div className="space-y-4">
             <ColorStop
@@ -53,21 +62,38 @@ export function ColorStopsSection({ gradient, expanded, onToggle, onUpdateGradie
             />
           </div>
 
-          <div className="pt-2 border-t border-gray-200/50">
-            <div className="relative pt-4">
-              <div className="absolute top-0 left-0 text-gray-400 text-[10px] font-bold uppercase tracking-wider">
-                Global Angle
+          {/* Type-Specific Controls */}
+          <div className="pt-2 border-t border-gray-200/50 space-y-4">
+            {gradient.gradientType === 'linear' && (
+              <div className="relative pt-2">
+                <div className="absolute top-0 left-0 text-gray-400 text-[10px] font-bold uppercase tracking-wider">
+                  Angle
+                </div>
+                <Slider
+                  label="Angle"
+                  value={gradient.gradientAngle}
+                  onChange={(v) => onUpdateGradient('gradientAngle', v)}
+                  min={0}
+                  max={360}
+                  unit="°"
+                  color="blue"
+                />
               </div>
-              <Slider
-                label="Global Angle"
-                value={gradient.gradientAngle}
-                onChange={(v) => onUpdateGradient('gradientAngle', v)}
-                min={0}
-                max={360}
-                unit="°"
-                color="blue"
+            )}
+
+            {gradient.gradientType === 'radial' && (
+              <RadialGradientControls
+                gradient={gradient}
+                onUpdate={onUpdateGradient}
               />
-            </div>
+            )}
+
+            {gradient.gradientType === 'conic' && (
+              <ConicGradientControls
+                gradient={gradient}
+                onUpdate={onUpdateGradient}
+              />
+            )}
           </div>
         </div>
       )}

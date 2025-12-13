@@ -32,6 +32,7 @@ export function ColorStop({ label, color, position, onColorChange, onPositionCha
             </span>
           </div>
           <Slider
+            label="Position"
             value={position}
             onChange={onPositionChange}
             min={0}
